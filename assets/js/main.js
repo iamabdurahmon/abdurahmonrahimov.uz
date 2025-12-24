@@ -23,7 +23,7 @@ const sendEmail = (e) => {
         // Remove message after five seconds
         setTimeout(() => {
           contactMessage.textContent = "";
-        }, 5000);
+        }, 3000);
 
         // clear input fields
         contactForm.reset();
