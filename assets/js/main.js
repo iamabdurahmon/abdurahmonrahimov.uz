@@ -1,12 +1,55 @@
-/*=============== EMAIL JS ===============*/
+// /*=============== EMAIL JS ===============*/
+
+// const contactForm = document.getElementById("contact-form"),
+//   contactMessage = document.getElementById("contact-message");
+
+// const sendEmail = (e) => {
+//   e.preventDefault();
+
+//   // serviceID - templateID - #form - publicKey
+//   emailjs
+//     .sendForm(
+//       "service_ff73e58",
+//       "template_yqbb9fx",
+//       "#contact-form",
+//       "AduQcFGPXljF8g5PJ"
+//     )
+
+//     .then(
+//       () => {
+//         // show sent message
+//         contactMessage.textContent = "Message sent successfully ✅";
+
+//         // Remove message after five seconds
+//         setTimeout(() => {
+//           contactMessage.textContent = "";
+//         }, 3000);
+
+//         // clear input fields
+//         contactForm.reset();
+//       },
+//       () => {
+//         // Show error messages
+//         contactMessage.textContent = "Message not sent (service error) ❌";
+//       }
+//     );
+// };
+
+// contactForm.addEventListener("submit", sendEmail);
+
+/*=============== EMAIL JS & TELEGRAM BOT ===============*/
 
 const contactForm = document.getElementById("contact-form"),
   contactMessage = document.getElementById("contact-message");
 
+// Telegram ma'lumotlari
+const botToken = "8239365513:AAGQY9AcMRvVGO2T7tEg1qtRX3L6990sqMI";
+const chatId = "5379497693";
+
 const sendEmail = (e) => {
   e.preventDefault();
 
-  // serviceID - templateID - #form - publicKey
+  // 1. EmailJS orqali yuborish
   emailjs
     .sendForm(
       "service_ff73e58",
@@ -14,22 +57,46 @@ const sendEmail = (e) => {
       "#contact-form",
       "AduQcFGPXljF8g5PJ"
     )
-
     .then(
       () => {
-        // show sent message
+        const formData = new FormData(contactForm);
+        const name = formData.get("user_name");
+        const email = formData.get("user_email");
+        const message = formData.get("user_message");
+
+        const telegramText = `
+<b>🚀 YOU HAVE A NEW MESSAGE</b>
+━━━━━━━━━━━━━━━━━━━━━━━━
+<b>👤 User Name:</b> <code>${name}</code>
+<b>📧 Email Address:</b> <code>${email}</code>
+<b>📅 Date:</b> <code>${new Date().toLocaleString()}</code>
+━━━━━━━━━━━━━━━━━━━━━━━━
+<b>📝 Message:</b>
+<i>"${message}"</i>
+━━━━━━━━━━━━━━━━━━━━━━━━
+✅ <i>This message has been sent by your website form.</i>
+`;
+
+        fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: telegramText,
+            parse_mode: "HTML",
+          }),
+        });
+        // -------------------------------------------------------------------------
+
         contactMessage.textContent = "Message sent successfully ✅";
 
-        // Remove message after five seconds
         setTimeout(() => {
           contactMessage.textContent = "";
         }, 3000);
 
-        // clear input fields
         contactForm.reset();
       },
       () => {
-        // Show error messages
         contactMessage.textContent = "Message not sent (service error) ❌";
       }
     );
